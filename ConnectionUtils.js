@@ -14,6 +14,18 @@ async function CreateMySQLConnectionFromConfigFile(filename) {
     return await mysql.createConnection(this.settings);
 }
 
+/**
+ * If the settings object contains the following values:
+ *  - host
+ *  - user
+ *  - password
+ *  - database
+ * create a MySQL connectino
+ */
+function CreateConnectionOrPoo(settings) {
+
+}
+
 module.exports = {
     CreateMySQLConnectionFromConfigFile: CreateMySQLConnectionFromConfigFile
 }

@@ -6,10 +6,16 @@ const ObservableQueryPaginator = require("./QueryPaginator").ObservableQueryPagi
  * This class is intended to be inherited by YOUR
  * database class. Your database can implement custom functions
  * running queries on the database.
- * This baseclass handles setting up the MySQL connection.
+ * This baseclass handles setting up the MySQL connection pool.
  *
- * Access the database connection by "this.conn".
- * Note that it is a mysql2/promise connection
+ * Access the database connection pool by "this.pool".
+ * Use this.pool.getConnection() to get access to a connection.
+ * Don't forget to this.pool.releaseConnection() the connection after using it!
+ *
+ * Alternatively, you can use the .Query() and .Execute() convenience
+ * functions.
+ *
+ * Note that this class uses a mysql2/promise connection
  * facilitating async/await queries.
  *
  * Best used with runWithDB()
@@ -17,7 +23,7 @@ const ObservableQueryPaginator = require("./QueryPaginator").ObservableQueryPagi
  * Example usage:
  * class MyDatabase extends AbstractMySQLDatabase {
  *      async QueryMyThing(param) {
- *          let [rows, fields] = await this.conn.query(`
+ *          let [rows, fields] = await this.pool.query(`
  *              SELECT ... WHERE key = ?`, [param])
  *          return rows.map(row => row.id)
  *      }
@@ -35,7 +41,7 @@ class AbstractMySQLDatabase {
      */
     constructor(settingsOrConfig) {
         this.settings = settingsOrConfig;
-        this.conn = null;
+        this.pool = null;
     }
     
     /**
@@ -46,7 +52,7 @@ class AbstractMySQLDatabase {
             let content = await fs.readFile(this.settings);
             this.settings = JSON.parse(content)
         }
-        this.conn = await mysql.createConnection(this.settings);
+        this.pool = await mysql.createPool(this.settings);
     }
 
     /**
@@ -54,17 +60,24 @@ class AbstractMySQLDatabase {
      * If using runWithDB(), calling this manually is NOT neccessary.
      */
     Close() {
-        if(this.conn !== null) {
-            this.conn.close();
-            this.conn = null;
+        if(this.pool !== null) {
+            this.pool.end();
+            this.pool = null;
         }
     }
 
     /**
-     * Identical to calling this.conn.query(sql, params)
+     * Identical to calling this.pool.query(sql, params)
      */
-    Query(sql, params) {
-        return this.conn.query(sql, params);
+    async Query(sql, params) {
+        return this.pool.query(sql, params);
+    }
+
+    /**
+     * Identical to calling this.pool.query(sql, params)
+     */
+    async Execute(sql, params) {
+        return this.pool.execute(sql, params);
     }
 
     /**
@@ -73,7 +86,7 @@ class AbstractMySQLDatabase {
      * See ObservableQueryPaginator for more docs.
      */
     QueryObservable(sql, params=[], pagesize=10000) {
-        let qp = new ObservableQueryPaginator(this.conn, sql, params, pagesize);
+        let qp = new ObservableQueryPaginator(this.pool, sql, params, pagesize);
         return qp.Query()
     }
 }

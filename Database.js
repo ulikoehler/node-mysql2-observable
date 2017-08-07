@@ -62,7 +62,7 @@ class AbstractMySQLDatabase {
      * See ObservableQueryPaginator for more docs.
      */
     QueryObservable(sql, params=[], pagesize=10000) {
-        let qp = new ObservableQueryPaginator(sql, params, pagesize);
+        let qp = new ObservableQueryPaginator(this.conn, sql, params, pagesize);
         return qp.Query()
     }
 

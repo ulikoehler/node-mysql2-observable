@@ -88,7 +88,7 @@ class AbstractMySQLDatabase {
  * })
  */
 async function runWithDB(constr, configSrc, fn) {
-    let db = constr(configSrc)
+    let db = new constr(configSrc)
     try {
         await db.Connect()
         await fn(db)

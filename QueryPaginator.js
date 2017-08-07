@@ -17,7 +17,7 @@ class ObservableQueryPaginator {
      * @param params: The parameter array for the statement (replaces ?s in sql)
      * @param pagesize: How many entries shall be fetched at once.
      */
-    constructor(conn, sql, params, pagesize=10000) {
+    constructor(conn, sql, params=[], pagesize=10000) {
         this.conn = conn;
         this.sql = sql + " LIMIT ?, ?";
         this.offset = 0;

@@ -49,6 +49,23 @@ class AbstractMySQLDatabase {
     }
 
     /**
+     * Identical to calling this.conn.query(sql, params)
+     */
+    Query(sql, params) {
+        return this.conn.query(sql, params);
+    }
+
+    /**
+     * Utility to create a ObservableQueryPaginator with the given parameters
+     * and calling Query() on it. Directly returns the observable.
+     * See ObservableQueryPaginator for more docs.
+     */
+    QueryObservable(sql, params=[], pagesize=10000) {
+        let qp = new ObservableQueryPaginator(sql, params, pagesize);
+        return qp.Query()
+    }
+
+    /**
      * Connect this database to the MySQL server.
      */
     async Connect() {

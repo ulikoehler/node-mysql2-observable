@@ -1,4 +1,4 @@
-const QueryPaginator = require("./QueryPaginator").QueryPaginator
+const ObservableQueryPaginator = require("./QueryPaginator").ObservableQueryPaginator
 const CreateMySQLConnectionFromConfigFile =
     require("./ConnectionUtils").CreateMySQLConnectionFromConfigFile
 const Database = require("./Database")

@@ -37,6 +37,17 @@ class AbstractMySQLDatabase {
         this.settings = settingsOrConfig;
         this.conn = null;
     }
+    
+    /**
+     * Connect this database to the MySQL server.
+     */
+    async Connect() {
+        if(typeof this.settings === "string") { // => filename
+            let content = await fs.readFile(this.settings);
+            this.settings = JSON.parse(content)
+        }
+        this.conn = await mysql.createConnection(this.settings);
+    }
 
     /**
      * Safely close the database connection.
@@ -64,17 +75,6 @@ class AbstractMySQLDatabase {
     QueryObservable(sql, params=[], pagesize=10000) {
         let qp = new ObservableQueryPaginator(this.conn, sql, params, pagesize);
         return qp.Query()
-    }
-
-    /**
-     * Connect this database to the MySQL server.
-     */
-    async Connect() {
-        if(typeof this.settings === "string") { // => filename
-            let content = await fs.readFile(this.settings);
-            this.settings = JSON.parse(content)
-        }
-        return await mysql.createConnection(this.settings);
     }
 }
 

@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
 const fs = require('mz/fs');
+const ObservableQueryPaginator = require("./QueryPaginator").ObservableQueryPaginator
 
 /**
  * This class is intended to be inherited by YOUR
@@ -70,7 +71,8 @@ class AbstractMySQLDatabase {
      */
     async Connect() {
         if(typeof this.settings === "string") { // => filename
-            this.settings = await fs.readFile(this.settings);
+            let content = await fs.readFile(this.settings);
+            this.settings = JSON.parse(content)
         }
         return await mysql.createConnection(this.settings);
     }

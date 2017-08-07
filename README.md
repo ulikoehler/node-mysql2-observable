@@ -1,6 +1,12 @@
 # node-mysql2-observable
 Convenient access to promise-based node-mysql2 using rxjs Observables and various ES6 features.
 
+### Installation
+
+```bash
+npm i --save mysql2-observable
+```
+
 ### AbstractMySQLDatabase example
 Provides convenient & safe database object lifecycle management.
 

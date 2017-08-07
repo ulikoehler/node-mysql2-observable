@@ -7,5 +7,5 @@ module.exports = {
     ObservableQueryPaginator: ObservableQueryPaginator,
     CreateMySQLConnectionFromConfigFile: CreateMySQLConnectionFromConfigFile,
     AbstractMySQLDatabase: Database.AbstractMySQLDatabase,
-    runWithDB: runWithDB
+    runWithDB: Database.runWithDB
 }

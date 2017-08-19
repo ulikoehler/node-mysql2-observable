@@ -41,3 +41,82 @@ myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
     console.log(result)
 })
 ```
+
+Within the `MyDatabase` class, you can use `this.Query()`, `this.Execute()` equivalently to the respective `mysql2` calls. Also, you can use `this.QueryObservable()`, which we'll cover in the next section. 
+
+### Using `Observable` to auto-paginate queries
+
+For this example, we're assuming that you've created `config.json`
+and you've setup the following table:
+
+```sql
+CREATE TABLE `testtable` (`val` int(11) NOT NULL);
+INSERT INTO `testtable` (`val`) VALUES (1), (2), (3), (4), (5);
+```
+
+Then, you can use `db.QueryObservable()` just like `db.Query`.
+
+```js
+let myobs = require("mysql2-observable");
+
+class MyDatabase extends myobs.AbstractMySQLDatabase {
+     ListValues(param) {
+         return this.QueryObservable("SELECT * FROM testtable")
+             .map(row => row.val)
+             .do(val => console.log(val)) // For each value
+             .ignoreElements() // Return no values in the Promise
+             .toPromise()
+     }
+}
+
+myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
+    /*
+     * Prints
+     * 1
+     * 2
+     * 3
+     * 4
+     * 5
+     */
+    await db.ListValues()
+})
+```
+
+This works internally by inserting a `LIMIT ?,?` string at the end of the statement and modifying the offset for each page until no values are left. All values are inserted into the `Observable` synchronously, so you won't run out of memory easily even for huge tables.
+
+The default page size is `10000`, but you can modify that by using a different value in the third argument of `db.QueryObservable()`. It is recommended to increase this value for very small result rows and decrease it for very large result rows.
+
+Note that in order to avoid having the query still running when the connection is closed (after the `async` callback to `runWithDB` is finished, the connection pool is closed), we need to convert the `Observable` to a `Promise` using `toPromise()`.
+Also note that the member function is not declared `async` because it doesn't contain any `await` statements, but it acts like an `async` function as it returns a `Promise` and can therefore be `await`ed. This is not a requirement relating to `QueryObservable`, if you do some postprocessing outside the `Observable` chain, you can `await` the `Promise` which you converted the `Observable` into and postprocess it in an `async` member function.
+
+One example of this would be to take the sum of the integers in the table:
+
+```js
+let myobs = require("mysql2-observable");
+
+class MyDatabase extends myobs.AbstractMySQLDatabase {
+     async ListValues(param) {
+         let result = await this.QueryObservable(
+            "SELECT * FROM testtable")
+             .map(row => row.val)
+             .toArray() // Collect all values into an array: [1,2,3,4,5]
+             .toPromise()
+         // Postprocess
+         let sum = 0
+         for(let val of result) {
+            sum += val
+         }
+         return sum
+     }
+}
+
+myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
+    /*
+     * Prints
+     * 15
+     */
+    console.log(await db.ListValues())
+})
+```
+
+For more information on what you can do with `Observable`s, see the [RxJS](http://reactivex.io/rxjs/) documentation.

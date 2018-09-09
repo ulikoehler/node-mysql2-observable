@@ -1,6 +1,6 @@
 {
   "name": "mysql2-observable",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Convenient access to promise-based node-mysql2 using rxjs Observables and various ES6 features.",
   "main": "index.js",
   "engines": {

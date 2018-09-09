@@ -3,7 +3,9 @@
   "version": "0.2.1",
   "description": "Convenient access to promise-based node-mysql2 using rxjs Observables and various ES6 features.",
   "main": "index.js",
-  "engines" : { "node" : ">=7.6" },
+  "engines": {
+    "node": ">=7.6"
+  },
   "scripts": {
     "test": "node test.js"
   },
@@ -24,8 +26,8 @@
   },
   "homepage": "https://github.com/ulikoehler/node-mysql2-observable#readme",
   "dependencies": {
-    "mysql2": "^1.4.0",
-    "mz": "^2.6.0",
+    "mysql2": "^1.6.1",
+    "mz": "^2.7.0",
     "rxjs": "^5.4.2"
   }
 }

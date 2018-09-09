@@ -27,7 +27,7 @@ to automatically setup the [`mysql2`](https://github.com/sidorares/node-mysql2) 
 
 ```js
 const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
-const { map } = require("rxjs/operator/map");
+const { map } = require("rxjs/operators");
 
 class MyDatabase extends AbstractMySQLDatabase {
      async QueryMyThing(param) {
@@ -59,10 +59,10 @@ Then, you can use `db.QueryObservable()` just like `db.Query`.
 
 ```js
 const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
-const { map } = require("rxjs/operator/map");
-const { do } = require("rxjs/operator/do");
-const { ignoreElements } = require("rxjs/operator/do");
-const { toPromise } = require("rxjs/operator/toPromise");
+const { map } = require("rxjs/operators");
+const { do } = require("rxjs/operators");
+const { ignoreElements } = require("rxjs/operators");
+const { toPromise } = require("rxjs/operators");
 
 class MyDatabase extends AbstractMySQLDatabase {
      ListValues(param) {
@@ -99,9 +99,9 @@ One example of this would be to take the sum of the integers in the table:
 
 ```js
 const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
-const { map } = require("rxjs/operator/map");
-const { toArray } = require("rxjs/operator/toArray");
-const { toPromise } = require("rxjs/operator/toPromise");
+const { map } = require("rxjs/operators");
+const { toArray } = require("rxjs/operators");
+const { toPromise } = require("rxjs/operators");
 
 
 class MyDatabase extends AbstractMySQLDatabase {

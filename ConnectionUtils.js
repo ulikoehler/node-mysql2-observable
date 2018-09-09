@@ -9,23 +9,11 @@ const fs = require('mz/fs');
  *  - password
  *  - database
  */
-async function CreateMySQLConnectionFromConfigFile(filename) {
-    let config = await fs.readFile("config.json");
-    return await mysql.createConnection(this.settings);
-}
-
-/**
- * If the settings object contains the following values:
- *  - host
- *  - user
- *  - password
- *  - database
- * create a MySQL connectino
- */
-function CreateConnectionOrPoo(settings) {
-
+async function CreateMySQLConnectionFromConfigFile (filename) {
+    const config = await fs.readFile('config.json');
+    return mysql.createConnection(config);
 }
 
 module.exports = {
     CreateMySQLConnectionFromConfigFile: CreateMySQLConnectionFromConfigFile
-}
+};

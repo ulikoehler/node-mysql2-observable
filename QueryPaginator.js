@@ -17,9 +17,9 @@ class ObservableQueryPaginator {
      * @param params: The parameter array for the statement (replaces ?s in sql)
      * @param pagesize: How many entries shall be fetched at once.
      */
-    constructor(conn, sql, params=[], pagesize=10000) {
+    constructor (conn, sql, params = [], pagesize = 10000) {
         this.conn = conn;
-        this.sql = sql + " LIMIT ?, ?";
+        this.sql = sql + ' LIMIT ?, ?';
         this.offset = 0;
         this.pagesize = pagesize;
         // Append offset, pagesizeidx to the parameter array
@@ -33,33 +33,33 @@ class ObservableQueryPaginator {
      * Get an observable that continues to emit
      * rows until no more rows are returned.
      */
-    Query() {
+    Query () {
         return Rx.Observable.create((observer) => {
-            this._fetchNext(observer).catch((err) => observer.error(err))
-        })
+            this._fetchNext(observer).catch((err) => observer.error(err));
+        });
     }
 
     /**
      * Internal function, do not call externally.
      */
-    async _fetchNext(observer) {
+    async _fetchNext (observer) {
         // Set new offset
         this.params[this.offsetIdx] = this.offset;
-        let [rows, fields] = await this.conn.query(this.sql, this.params)
-        if(rows.length == 0) {
-            observer.complete()
+        let [rows, fields] = await this.conn.query(this.sql, this.params);
+        if (rows.length == 0) {
+            observer.complete();
         } else {
             // Process current data
-            for(var row of rows) {
-                observer.next(row)
+            for (var row of rows) {
+                observer.next(row);
             }
             // Continue with next page
             this.offset += this.pagesize;
-            await this._fetchNext(observer)
+            await this._fetchNext(observer);
         }
     }
 }
 
 module.exports = {
     ObservableQueryPaginator: ObservableQueryPaginator
-}
+};

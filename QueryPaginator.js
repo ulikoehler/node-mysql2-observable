@@ -44,7 +44,7 @@ class ObservableQueryPaginator {
     async _fetchNext (observer) {
         // Set new offset
         this.params[this.offsetIdx] = this.offset;
-        const rows = await this.conn.query(this.sql, this.params)[0];
+        const [rows, fields] = await this.conn.query(this.sql, this.params);
         if (rows.length === 0) {
             observer.complete();
         } else {

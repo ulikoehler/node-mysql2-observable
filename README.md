@@ -43,7 +43,7 @@ runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
 });
 ```
 
-Within the `MyDatabase` class, you can use `this.Query()`, `this.Execute()` equivalently to the respective `mysql2` calls. Also, you can use `this.QueryObservable()`, which we'll cover in the next section. 
+Within the `MyDatabase` class, you can use `this.Query()`, `this.Execute()` equivalently to the respective `mysql2` calls. `this.pool` provides the raw `mysql2` connection pool. Also, you can use `this.QueryObservable()`, which we'll cover in the next section. 
 
 ### Using `Observable` to auto-paginate queries
 

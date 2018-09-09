@@ -23,14 +23,14 @@ const ObservableQueryPaginator = require('./QueryPaginator').ObservableQueryPagi
  * Example usage:
  * class MyDatabase extends AbstractMySQLDatabase {
  *      async QueryMyThing(param) {
- *          let [rows, fields] = await this.pool.query(`
+ *          const [rows, fields] = await this.pool.query(`
  *              SELECT ... WHERE key = ?`, [param])
  *          return rows.pipe(map(row => row.id))
  *      }
  * }
  *
  * runWithDB(MyDatabase, "config.json", async (db) => {
- *     let result = db.QueryMyThing(12345);
+ *     const result = db.QueryMyThing(12345);
  *     console.log(result)
  * })
  */
@@ -49,7 +49,7 @@ class AbstractMySQLDatabase {
      */
     async Connect () {
         if (typeof this.settings === 'string') { // => filename
-            let content = await fs.readFile(this.settings);
+            const content = await fs.readFile(this.settings);
             this.settings = JSON.parse(content);
         }
         this.pool = await mysql.createPool(this.settings);
@@ -86,7 +86,7 @@ class AbstractMySQLDatabase {
      * See ObservableQueryPaginator for more docs.
      */
     QueryObservable (sql, params = [], pagesize = 10000) {
-        let qp = new ObservableQueryPaginator(this.pool, sql, params, pagesize);
+        const qp = new ObservableQueryPaginator(this.pool, sql, params, pagesize);
         return qp.Query();
     }
 }
@@ -98,12 +98,12 @@ class AbstractMySQLDatabase {
  * Usage example:
  *
  * runWithDB(MyDatabase, "config.json", async (db) => {
- *     let result = db.QueryMyThing(12345);
+ *     const result = db.QueryMyThing(12345);
  *     console.log(result)
  * })
  */
 async function runWithDB (constr, configSrc, fn) {
-    let db = new constr(configSrc);
+    const db = new constr(configSrc);
     try {
         await db.Connect();
         await fn(db);

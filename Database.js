@@ -25,7 +25,7 @@ const ObservableQueryPaginator = require("./QueryPaginator").ObservableQueryPagi
  *      async QueryMyThing(param) {
  *          let [rows, fields] = await this.pool.query(`
  *              SELECT ... WHERE key = ?`, [param])
- *          return rows.map(row => row.id)
+ *          return rows.pipe(map(row => row.id))
  *      }
  * }
  * 

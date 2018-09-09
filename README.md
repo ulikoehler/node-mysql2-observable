@@ -1,4 +1,4 @@
-# node-mysql2-observable
+# mysql2-observable
 Convenient access to promise-based node-mysql2 using rxjs Observables and various ES6 features.
 
 ### Installation
@@ -26,20 +26,21 @@ Then, you can create a custom subclass of `AbstractMySQLDatabase`
 to automatically setup the [`mysql2`](https://github.com/sidorares/node-mysql2) connection pool.
 
 ```js
-let myobs = require("mysql2-observable");
+const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
+const { map } = require("rxjs/operator/map");
 
-class MyDatabase extends myobs.AbstractMySQLDatabase {
+class MyDatabase extends AbstractMySQLDatabase {
      async QueryMyThing(param) {
          let [rows, fields] = await this.Query(`
              SELECT ... WHERE key = ?`, [param])
-         return rows.map(row => row.id)
+         return rows.pipe(map(row => row.id))
      }
 }
 
-myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
+runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
     let result = await db.QueryMyThing(12345);
     console.log(result)
-})
+});
 ```
 
 Within the `MyDatabase` class, you can use `this.Query()`, `this.Execute()` equivalently to the respective `mysql2` calls. Also, you can use `this.QueryObservable()`, which we'll cover in the next section. 
@@ -57,19 +58,24 @@ INSERT INTO `testtable` (`val`) VALUES (1), (2), (3), (4), (5);
 Then, you can use `db.QueryObservable()` just like `db.Query`.
 
 ```js
-let myobs = require("mysql2-observable");
+const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
+const { map } = require("rxjs/operator/map");
+const { do } = require("rxjs/operator/do");
+const { ignoreElements } = require("rxjs/operator/do");
+const { toPromise } = require("rxjs/operator/toPromise");
 
-class MyDatabase extends myobs.AbstractMySQLDatabase {
+class MyDatabase extends AbstractMySQLDatabase {
      ListValues(param) {
-         return this.QueryObservable("SELECT * FROM testtable")
-             .map(row => row.val)
-             .do(val => console.log(val)) // For each value
-             .ignoreElements() // Return no values in the Promise
-             .toPromise()
+         return this.QueryObservable("SELECT * FROM testtable").pipe(
+            map(row => row.val),
+            do(val => console.log(val)), // For each value
+            ignoreElements(), // Return no values in the Promise
+            toPromise()
+         )
      }
 }
 
-myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
+runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
     /*
      * Prints
      * 1
@@ -79,7 +85,7 @@ myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
      * 5
      */
     await db.ListValues()
-})
+});
 ```
 
 This works internally by inserting a `LIMIT ?,?` string at the end of the statement and modifying the offset for each page until no values are left. All values are inserted into the `Observable` synchronously, so you won't run out of memory easily even for huge tables.
@@ -92,31 +98,36 @@ Also note that the member function is not declared `async` because it doesn't co
 One example of this would be to take the sum of the integers in the table:
 
 ```js
-let myobs = require("mysql2-observable");
+const { AbstractMySQLDatabase, runWithDB } = require("mysql2-observable");
+const { map } = require("rxjs/operator/map");
+const { toArray } = require("rxjs/operator/toArray");
+const { toPromise } = require("rxjs/operator/toPromise");
 
-class MyDatabase extends myobs.AbstractMySQLDatabase {
+
+class MyDatabase extends AbstractMySQLDatabase {
      async ListValues(param) {
-         let result = await this.QueryObservable(
-            "SELECT * FROM testtable")
-             .map(row => row.val)
-             .toArray() // Collect all values into an array: [1,2,3,4,5]
-             .toPromise()
+         const result = await this.QueryObservable(
+            "SELECT * FROM testtable").pipe(
+             map(row => row.val),
+             toArray(), // Collect all values into an array: [1,2,3,4,5]
+             toPromise()
+         )
          // Postprocess
          let sum = 0
-         for(let val of result) {
-            sum += val
+         for(const val of result) {
+            sum += val;
          }
          return sum
      }
 }
 
-myobs.runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
+runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
     /*
      * Prints
      * 15
      */
     console.log(await db.ListValues())
-})
+});
 ```
 
 For more information on what you can do with `Observable`s, see the [RxJS](http://reactivex.io/rxjs/) documentation.

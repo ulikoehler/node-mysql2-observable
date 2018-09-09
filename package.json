@@ -6,9 +6,6 @@
   "engines": {
     "node": ">=7.6"
   },
-  "scripts": {
-    "test": "node test.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ulikoehler/node-mysql2-observable.git"

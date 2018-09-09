@@ -113,7 +113,7 @@ class MyDatabase extends AbstractMySQLDatabase {
              toPromise()
          )
          // Postprocess
-         let sum = 0
+         let sum = 0;
          for(const val of result) {
             sum += val;
          }
@@ -126,7 +126,7 @@ runWithDB(MyDatabase, __dirname + "/config.json", async (db) => {
      * Prints
      * 15
      */
-    console.log(await db.ListValues())
+    console.log(await db.ListValues());
 });
 ```
 

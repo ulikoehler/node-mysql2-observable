@@ -1,4 +1,3 @@
-const mysql = require('mysql2/promise');
 const Rx = require('rxjs/Rx');
 
 /**
@@ -34,7 +33,7 @@ class ObservableQueryPaginator {
      * rows until no more rows are returned.
      */
     Query () {
-        return Rx.Observable.create((observer) => {
+        return Rx.Observable.create(observer => {
             this._fetchNext(observer).catch((err) => observer.error(err));
         });
     }
@@ -46,7 +45,7 @@ class ObservableQueryPaginator {
         // Set new offset
         this.params[this.offsetIdx] = this.offset;
         let [rows, fields] = await this.conn.query(this.sql, this.params);
-        if (rows.length == 0) {
+        if (rows.length === 0) {
             observer.complete();
         } else {
             // Process current data

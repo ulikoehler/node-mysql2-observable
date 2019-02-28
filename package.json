@@ -24,8 +24,8 @@
   "homepage": "https://github.com/ulikoehler/node-mysql2-observable#readme",
   "dependencies": {
     "eslint": "^5.5.0",
-    "mysql2": "^1.6.1",
+    "mysql2": "^1.6.5",
     "mz": "^2.7.0",
-    "rxjs": "^5.4.2"
+    "rxjs": "^6.4.0"
   }
 }
